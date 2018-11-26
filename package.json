@@ -1,15 +1,20 @@
 {
-  "name": "converter",
+  "name": "c_ts",
   "version": "1.0.0",
   "description": "",
-  "main": "index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron ."
+    "build": "tsc",
+    "watch": "tsc -w",
+    "lint": "tslint -c tslint.json -p tsconfig.json",
+    "start": "npm run build && electron ./dist/main.js"
   },
+  "repository": "",
+  "keywords": [],
   "author": "phoenix",
-  "license": "MIT",
+  "license": "GPLv3",
   "devDependencies": {
-    "electron": "^3.0.10"
+    "electron": "^3.0.10",
+    "tslint": "^5.10.0",
+    "typescript": "^3.1.6"
   }
 }

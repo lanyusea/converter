@@ -3,7 +3,12 @@ exports.__esModule = true;
 // @ts-ignore
 var electron_1 = require("electron");
 var path = require("path");
+var ipcMain = require('electron').ipcMain;
 var mainWindow;
+function DataRecvInfo() {
+    console.log("backend");
+}
+ipcMain.on("file_upload", DataRecvInfo);
 function createWindow() {
     // Create the browser window.
     mainWindow = new electron_1.BrowserWindow({
@@ -12,7 +17,6 @@ function createWindow() {
     });
     // and load the index.html of the app.
     mainWindow.loadFile(path.join(__dirname, "../index.html"));
-    // Open the DevTools.
     mainWindow.webContents.openDevTools();
     // Emitted when the window is closed.
     mainWindow.on("closed", function () {

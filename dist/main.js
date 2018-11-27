@@ -35,7 +35,12 @@ function DataRecvInfo(event) {
         event.returnValue = fileConverter.load(fileNames);
     });
 }
+function ConvertReq(event, videoType) {
+    event.returnValue = fileConverter.convert();
+    console.log(videoType);
+}
 ipcMain.on("file_upload", DataRecvInfo);
+ipcMain.on("convert", ConvertReq);
 function createWindow() {
     // Create the browser window.
     mainWindow = new electron_1.BrowserWindow({

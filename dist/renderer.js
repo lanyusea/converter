@@ -10,5 +10,11 @@ function getFile() {
         infoArea.textContent += ("> " + value + " \r\n");
     });
 }
+function convert() {
+    var chooseList = document.getElementById("video_type");
+    var videoType = chooseList.value;
+    ipcRenderer.sendSync("convert", videoType);
+}
 document.querySelector('#btnGetFile').addEventListener('click', getFile);
+document.querySelector('#btnConvert').addEventListener('click', convert);
 //# sourceMappingURL=renderer.js.map

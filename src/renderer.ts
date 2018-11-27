@@ -13,4 +13,11 @@ function getFile() {
     })
 }
 
+function convert() {
+    let chooseList = <HTMLInputElement>document.getElementById("video_type");
+    let videoType = chooseList.value;
+    ipcRenderer.sendSync("convert", videoType)
+}
+
 document.querySelector('#btnGetFile').addEventListener('click', getFile)
+document.querySelector('#btnConvert').addEventListener('click', convert)

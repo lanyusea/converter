@@ -34,7 +34,13 @@ function DataRecvInfo(event:any){
     });
 }
 
+function ConvertReq(event:any, videoType:string){
+    event.returnValue = fileConverter.convert();
+    console.log(videoType)
+}
+
 ipcMain.on("file_upload", DataRecvInfo);
+ipcMain.on("convert", ConvertReq);
 
 function createWindow() {
     // Create the browser window.

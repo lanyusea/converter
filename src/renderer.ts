@@ -3,17 +3,14 @@
 // All of the Node.js APIs are available in this process.
 
 const {ipcRenderer} = require('electron')
-const { dialog } = require('electron').remote
-
+const infoArea = document.getElementById( 'file-upload-filename' );
 
 function getFile() {
-    console.log("haha")
-
-    dialog.showOpenDialog( {properties: ['openFile', 'multiSelections']}, function (fileNames) {
-        console.log(fileNames);
-    });
-
-    ipcRenderer.send("file_upload")
+    let fileNames = ipcRenderer.sendSync("file_upload")
+    infoArea.textContent = "File name: \r\n";
+    fileNames.forEach(function(value:string){
+        infoArea.textContent += ("> "+value+" \r\n");
+    })
 }
 
 document.querySelector('#btnGetFile').addEventListener('click', getFile)

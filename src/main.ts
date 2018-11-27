@@ -1,13 +1,37 @@
 // @ts-ignore
-import { app, BrowserWindow } from "electron";
+import { app, dialog, BrowserWindow } from "electron";
 import * as path from "path";
 
+class fileTypeConverter {
+    fileList: string[];
+    load(fileNames:string[]){
+        this.fileList = fileNames;
+        console.log(this.fileList);
+        return this.fileList;
+    }
+    convert(){
+        /* TODO
+         * 1. called by ipcRender
+         * 2. do the convert
+         * 3. reply by ipcMain
+         */
+    }
+    save(){
+        /* TODO
+         * 1. called by ipcRender
+         * 2. save the file
+         * 3. reply by ipcMain
+         */
+    }
+}
 const {ipcMain} = require('electron')
-
 let mainWindow: Electron.BrowserWindow;
+const fileConverter = new fileTypeConverter();
 
-function DataRecvInfo(){
-    console.log("backend");
+function DataRecvInfo(event:any){
+    dialog.showOpenDialog( {properties: ['openFile', 'multiSelections']}, function (fileNames) {
+        event.returnValue = fileConverter.load(fileNames);
+    });
 }
 
 ipcMain.on("file_upload", DataRecvInfo);

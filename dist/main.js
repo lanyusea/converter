@@ -3,10 +3,37 @@ exports.__esModule = true;
 // @ts-ignore
 var electron_1 = require("electron");
 var path = require("path");
+var fileTypeConverter = /** @class */ (function () {
+    function fileTypeConverter() {
+    }
+    fileTypeConverter.prototype.load = function (fileNames) {
+        this.fileList = fileNames;
+        console.log(this.fileList);
+        return this.fileList;
+    };
+    fileTypeConverter.prototype.convert = function () {
+        /* TODO
+         * 1. called by ipcRender
+         * 2. do the convert
+         * 3. reply by ipcMain
+         */
+    };
+    fileTypeConverter.prototype.save = function () {
+        /* TODO
+         * 1. called by ipcRender
+         * 2. save the file
+         * 3. reply by ipcMain
+         */
+    };
+    return fileTypeConverter;
+}());
 var ipcMain = require('electron').ipcMain;
 var mainWindow;
-function DataRecvInfo() {
-    console.log("backend");
+var fileConverter = new fileTypeConverter();
+function DataRecvInfo(event) {
+    electron_1.dialog.showOpenDialog({ properties: ['openFile', 'multiSelections'] }, function (fileNames) {
+        event.returnValue = fileConverter.load(fileNames);
+    });
 }
 ipcMain.on("file_upload", DataRecvInfo);
 function createWindow() {

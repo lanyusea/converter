@@ -2,13 +2,13 @@
 // be executed in the renderer process for that window.
 // All of the Node.js APIs are available in this process.
 var ipcRenderer = require('electron').ipcRenderer;
-var dialog = require('electron').remote.dialog;
+var infoArea = document.getElementById('file-upload-filename');
 function getFile() {
-    console.log("haha");
-    dialog.showOpenDialog({ properties: ['openFile', 'multiSelections'] }, function (fileNames) {
-        console.log(fileNames);
+    var fileNames = ipcRenderer.sendSync("file_upload");
+    infoArea.textContent = "File name: \r\n";
+    fileNames.forEach(function (value) {
+        infoArea.textContent += ("> " + value + " \r\n");
     });
-    ipcRenderer.send("file_upload");
 }
 document.querySelector('#btnGetFile').addEventListener('click', getFile);
 //# sourceMappingURL=renderer.js.map

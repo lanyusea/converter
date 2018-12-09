@@ -5,25 +5,37 @@ var electron_1 = require("electron");
 var path = require("path");
 var fileTypeConverter = /** @class */ (function () {
     function fileTypeConverter() {
+        this.ffmpeg = require('fluent-ffmpeg');
+        var ffmpeg_path = require('ffmpeg-static-electron');
+        this.ffmpeg.setFfmpegPath(ffmpeg_path.path);
     }
     fileTypeConverter.prototype.load = function (fileNames) {
         this.fileList = fileNames;
-        console.log(this.fileList);
         return this.fileList;
     };
-    fileTypeConverter.prototype.convert = function () {
-        /* TODO
-         * 1. called by ipcRender
-         * 2. do the convert
-         * 3. reply by ipcMain
-         */
-    };
-    fileTypeConverter.prototype.save = function () {
-        /* TODO
-         * 1. called by ipcRender
-         * 2. save the file
-         * 3. reply by ipcMain
-         */
+    fileTypeConverter.prototype.convert = function (event_, type) {
+        var num = 0;
+        var _loop_1 = function (entry) {
+            var newName = entry.slice(0, -path.extname(entry).length) + '.' + type;
+            this_1.ffmpeg(entry)
+                .toFormat(type)
+                .saveToFile(newName)
+                .on('progress', function (progress) {
+                event_.sender.send('convert', 'Processing ' + entry + ' : ' + progress.percent + '% done');
+            })
+                .on('end', function () {
+                event_.sender.send('convert', 'File ' + entry + ' has been converted successfully');
+            })
+                .on('error', function (err) {
+                event_.sender.send('convert', 'An error happened when convert ' + entry + ' : ' + err.message);
+            });
+            num++;
+        };
+        var this_1 = this;
+        for (var _i = 0, _a = this.fileList; _i < _a.length; _i++) {
+            var entry = _a[_i];
+            _loop_1(entry);
+        }
     };
     return fileTypeConverter;
 }());
@@ -36,8 +48,7 @@ function DataRecvInfo(event) {
     });
 }
 function ConvertReq(event, videoType) {
-    event.returnValue = fileConverter.convert();
-    console.log(videoType);
+    event.returnValue = fileConverter.convert(event, videoType);
 }
 ipcMain.on("file_upload", DataRecvInfo);
 ipcMain.on("convert", ConvertReq);

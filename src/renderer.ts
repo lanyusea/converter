@@ -5,6 +5,13 @@
 const {ipcRenderer} = require('electron')
 const infoArea = document.getElementById( 'file-upload-filename' );
 
+ipcRenderer.on('convert', (event:any, result:string) => {
+    let div = document.createElement("div");
+    div.setAttribute('class', 'default');
+    div.innerHTML = result;
+    document.getElementById("file-convert-result").prepend(div);
+})
+
 function getFile() {
     let fileNames = ipcRenderer.sendSync("file_upload")
     infoArea.textContent = "File name: \r\n";
@@ -16,7 +23,7 @@ function getFile() {
 function convert() {
     let chooseList = <HTMLInputElement>document.getElementById("video_type");
     let videoType = chooseList.value;
-    ipcRenderer.sendSync("convert", videoType)
+    ipcRenderer.send("convert", videoType)
 }
 
 document.querySelector('#btnGetFile').addEventListener('click', getFile)

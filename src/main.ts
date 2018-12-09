@@ -3,27 +3,39 @@ import { app, dialog, BrowserWindow } from "electron";
 import * as path from "path";
 
 class fileTypeConverter {
-    fileList: string[];
+    private fileList: string[];
+    private ffmpeg: any;
+
+    constructor() {
+        this.ffmpeg = require('fluent-ffmpeg');
+        let ffmpeg_path = require('ffmpeg-static-electron');
+        this.ffmpeg.setFfmpegPath(ffmpeg_path.path);
+    }
+
     load(fileNames:string[]){
         this.fileList = fileNames;
-        console.log(this.fileList);
         return this.fileList;
     }
-    convert(){
-        /* TODO
-         * 1. called by ipcRender
-         * 2. do the convert
-         * 3. reply by ipcMain
-         */
-    }
-    save(){
-        /* TODO
-         * 1. called by ipcRender
-         * 2. save the file
-         * 3. reply by ipcMain
-         */
-    }
+    convert(event_:any, type:string){
+        for(let entry of this.fileList){
+            let newName = entry.slice(0, -path.extname(entry).length) + '.' + type;
+
+            this.ffmpeg(entry)
+                .toFormat(type)
+                .saveToFile(newName)
+                .on('progress', function(progress:any) {
+                    event_.sender.send('convert', 'Processing '+ entry +' : ' + progress.percent + '% done');
+                })
+                .on('end', function() {
+                    event_.sender.send('convert', 'File ' + entry + ' has been converted successfully');
+                })
+                .on('error', function(err:any) {
+                    event_.sender.send('convert', 'An error happened when convert ' + entry + ' : ' + err.message);
+                });
+        }
+   }
 }
+
 const {ipcMain} = require('electron')
 let mainWindow: Electron.BrowserWindow;
 const fileConverter = new fileTypeConverter();
@@ -35,8 +47,7 @@ function DataRecvInfo(event:any){
 }
 
 function ConvertReq(event:any, videoType:string){
-    event.returnValue = fileConverter.convert();
-    console.log(videoType)
+    event.returnValue = fileConverter.convert(event, videoType);
 }
 
 ipcMain.on("file_upload", DataRecvInfo);
